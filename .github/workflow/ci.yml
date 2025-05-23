@@ -1,0 +1,24 @@
+name: Python CI with pytest
+
+on: [push, pull_request]  # Triggers on any push or pull request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"  # or any version you prefer
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pytest
+
+      - name: Run tests
+        run: pytest
