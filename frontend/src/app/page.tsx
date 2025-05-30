@@ -1,11 +1,19 @@
-import { redirect } from "next/navigation";
-import { DashboardPage } from "@/components/dashboard/dashboard-page";
+import HeroSection from "@/components/hero-section";
+import FeaturesSection from "@/components/features-7";
+import StatsSection from "@/components/stats-4";
+import TestimonialsSection from "@/components/testimonials";
+import PricingSection from "@/components/pricing";
+import FooterSection from "@/components/footer";
 
 export default function Home() {
-  const isAuthenticated = false;
-  // if (!isAuthenticated) {
-  //   redirect("/login");
-  // }
-
-  return <DashboardPage />;
+  return (
+    <div className="">
+      <HeroSection />
+      <FeaturesSection />
+      <StatsSection />
+      <TestimonialsSection />
+      <PricingSection />
+      <FooterSection />
+    </div>
+  );
 }
