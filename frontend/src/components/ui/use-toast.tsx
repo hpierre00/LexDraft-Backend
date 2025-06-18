@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import * as ToastPrimitives from "@radix-ui/react-toast";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -126,12 +128,24 @@ export {
   ToastAction,
 };
 
-export function useToast() {
-  const [toasts, setToasts] = React.useState<ToastProps[]>([]);
+// Define a new type for the toast payload that `useToast` will manage
+export type ToastPayload = ToastProps & {
+  id: string;
+  title?: string;
+  description?: string;
+  action?: ToastActionElement;
+};
 
-  const toast = React.useCallback(({ ...props }: ToastProps) => {
-    setToasts((prevToasts) => [...prevToasts, props]);
-  }, []);
+export function useToast() {
+  const [toasts, setToasts] = React.useState<ToastPayload[]>([]);
+
+  const toast = React.useCallback(
+    ({ ...props }: Omit<ToastPayload, "id"> & { id?: string }) => {
+      const id = props.id || crypto.randomUUID();
+      setToasts((prevToasts) => [...prevToasts, { id, ...props }]);
+    },
+    []
+  );
 
   const dismiss = React.useCallback((id: string) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));

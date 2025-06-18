@@ -1,10 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { FileText, MoreHorizontal, Plus, Search, SortAsc, SortDesc } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  FileText,
+  MoreHorizontal,
+  Plus,
+  Search,
+  SortAsc,
+  SortDesc,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,128 +19,76 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
-
-interface Document {
-  id: string
-  title: string
-  updatedAt: string
-  status: "draft" | "completed" | "in-review"
-  type: string
-}
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { documentService, Document } from "@/api/documents";
+import { useToast } from "@/components/ui/use-toast";
 
 export function DocumentList() {
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const { toast } = useToast();
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
-    // Simulate API call
     const fetchDocuments = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      try {
+        const docs = await documentService.getAll();
+        setDocuments(docs);
+      } catch (err) {
+        console.error("Failed to fetch documents:", err);
+        setError("Failed to load documents. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      setDocuments([
-        {
-          id: "1",
-          title: "Employment Agreement - Software Engineer",
-          updatedAt: "2023-05-15T10:30:00Z",
-          status: "completed",
-          type: "Employment",
-        },
-        {
-          id: "2",
-          title: "Non-Disclosure Agreement - Project Alpha",
-          updatedAt: "2023-05-14T14:45:00Z",
-          status: "draft",
-          type: "NDA",
-        },
-        {
-          id: "3",
-          title: "Service Agreement - Web Development",
-          updatedAt: "2023-05-12T09:15:00Z",
-          status: "in-review",
-          type: "Service",
-        },
-        {
-          id: "4",
-          title: "Software License Agreement",
-          updatedAt: "2023-05-10T16:20:00Z",
-          status: "completed",
-          type: "License",
-        },
-        {
-          id: "5",
-          title: "Consulting Agreement - Marketing Strategy",
-          updatedAt: "2023-05-08T11:20:00Z",
-          status: "draft",
-          type: "Consulting",
-        },
-        {
-          id: "6",
-          title: "Partnership Agreement - Joint Venture",
-          updatedAt: "2023-05-05T13:40:00Z",
-          status: "completed",
-          type: "Partnership",
-        },
-        {
-          id: "7",
-          title: "Lease Agreement - Office Space",
-          updatedAt: "2023-05-03T09:10:00Z",
-          status: "in-review",
-          type: "Lease",
-        },
-        {
-          id: "8",
-          title: "Independent Contractor Agreement",
-          updatedAt: "2023-05-01T15:30:00Z",
-          status: "completed",
-          type: "Employment",
-        },
-      ])
-
-      setIsLoading(false)
-    }
-
-    fetchDocuments()
-  }, [])
+    fetchDocuments();
+  }, []);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    }).format(date)
-  }
+    }).format(date);
+  };
 
   const getStatusBadgeClass = (status: Document["status"]) => {
     switch (status) {
       case "draft":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "completed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "in-review":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const filteredDocuments = documents
     .filter(
       (doc) =>
         doc.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (statusFilter === "all" || doc.status === statusFilter),
+        (statusFilter === "all" || doc.status === statusFilter)
     )
     .sort((a, b) => {
-      const dateA = new Date(a.updatedAt).getTime()
-      const dateB = new Date(b.updatedAt).getTime()
-      return sortOrder === "asc" ? dateA - dateB : dateB - dateA
-    })
+      const dateA = new Date(a.updated_at).getTime();
+      const dateB = new Date(b.updated_at).getTime();
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
 
   if (isLoading) {
     return (
@@ -144,7 +99,10 @@ export function DocumentList() {
         </div>
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="flex items-center space-x-4 rounded-lg border p-4">
+            <div
+              key={index}
+              className="flex items-center space-x-4 rounded-lg border p-4"
+            >
               <Skeleton className="h-10 w-10 rounded-full" />
               <div className="space-y-2 flex-1">
                 <Skeleton className="h-4 w-3/4" />
@@ -154,7 +112,11 @@ export function DocumentList() {
           ))}
         </div>
       </div>
-    )
+    );
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
   }
 
   return (
@@ -182,9 +144,19 @@ export function DocumentList() {
               <SelectItem value="completed">Completed</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="icon" onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
-            {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
-            <span className="sr-only">Sort by date {sortOrder === "asc" ? "ascending" : "descending"}</span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          >
+            {sortOrder === "asc" ? (
+              <SortAsc className="h-4 w-4" />
+            ) : (
+              <SortDesc className="h-4 w-4" />
+            )}
+            <span className="sr-only">
+              Sort by date {sortOrder === "asc" ? "ascending" : "descending"}
+            </span>
           </Button>
           <Button asChild>
             <Link href="/create">
@@ -222,18 +194,21 @@ export function DocumentList() {
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <Link href={`/documents/${doc.id}`} className="font-medium hover:underline">
+                  <Link
+                    href={`/documents/${doc.id}`}
+                    className="font-medium hover:underline"
+                  >
                     {doc.title}
                   </Link>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-                    <span>Updated {formatDate(doc.updatedAt)}</span>
+                    <span>Updated {formatDate(doc.updated_at)}</span>
                     <span>•</span>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusBadgeClass(doc.status)}`}>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusBadgeClass(
+                        doc.status
+                      )}`}
+                    >
                       {doc.status.replace("-", " ")}
-                    </span>
-                    <span>•</span>
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">
-                      {doc.type}
                     </span>
                   </div>
                 </div>
@@ -252,10 +227,33 @@ export function DocumentList() {
                       Edit document
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Download PDF</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      try {
+                        await documentService.download(doc.id);
+                        toast({
+                          title: "Document downloaded",
+                          description:
+                            "Your document has been downloaded as a PDF.",
+                        });
+                      } catch (error) {
+                        console.error("Failed to download document:", error);
+                        toast({
+                          variant: "destructive",
+                          title: "Error",
+                          description:
+                            "Failed to download document. Please try again.",
+                        });
+                      }
+                    }}
+                  >
+                    Download PDF
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Share document</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">Delete document</DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive">
+                    Delete document
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -263,5 +261,5 @@ export function DocumentList() {
         </div>
       )}
     </div>
-  )
+  );
 }

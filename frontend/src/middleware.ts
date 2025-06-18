@@ -21,6 +21,7 @@ export const config = {
     '/dashboard/:path*',
     '/documents/:path*',
     '/templates/:path*',
+    '/evaluate/:path*',
     '/settings/:path*',
     '/login',
     '/register'

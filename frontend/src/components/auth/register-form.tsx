@@ -1,18 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { authService } from "@/api/auth";
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -25,12 +33,12 @@ const formSchema = z.object({
   termsAndConditions: z.boolean().refine((val) => val === true, {
     message: "You must agree to the terms and conditions",
   }),
-})
+});
 
 export function RegisterForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,28 +48,31 @@ export function RegisterForm() {
       password: "",
       termsAndConditions: false,
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // In a real app, we would call the API here
-      // await authService.register({
-      //   email: values.email,
-      //   password: values.password,
-      // })
+      // Split fullName into first and last name for backend
+      const [first_name, ...rest] = values.fullName.trim().split(" ");
+      const last_name = rest.join(" ") || "-";
+      await authService.register({
+        email: values.email,
+        password: values.password,
+        first_name,
+        last_name,
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      toast.success(
+        "Registration successful. Please check your email to confirm your account."
+      );
 
-      toast.success("Registration successful")
-
-      router.push("/login")
-    } catch (error) {
-      toast.error("Registration failed")
+      router.push("/login");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.detail || "Registration failed");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -69,7 +80,9 @@ export function RegisterForm() {
     <div className="space-y-6">
       <div className="space-y-2 text-center">
         <h2 className="text-2xl font-semibold">Create your account</h2>
-        <p className="text-sm text-muted-foreground">Enter your information to create an account</p>
+        <p className="text-sm text-muted-foreground">
+          Enter your information to create an account
+        </p>
       </div>
 
       <Form {...form}>
@@ -95,7 +108,11 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>Email address</FormLabel>
                 <FormControl>
-                  <Input placeholder="name@company.com" type="email" {...field} />
+                  <Input
+                    placeholder="name@company.com"
+                    type="email"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -110,7 +127,11 @@ export function RegisterForm() {
                 <FormLabel>Password</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input placeholder="••••••••" type={showPassword ? "text" : "password"} {...field} />
+                    <Input
+                      placeholder="••••••••"
+                      type={showPassword ? "text" : "password"}
+                      {...field}
+                    />
                     <Button
                       type="button"
                       variant="ghost"
@@ -123,13 +144,16 @@ export function RegisterForm() {
                       ) : (
                         <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
-                      <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                      <span className="sr-only">
+                        {showPassword ? "Hide password" : "Show password"}
+                      </span>
                     </Button>
                   </div>
                 </FormControl>
                 <FormMessage />
                 <p className="text-xs text-muted-foreground">
-                  Must be at least 8 characters and include a number and a special character
+                  Must be at least 8 characters and include a number and a
+                  special character
                 </p>
               </FormItem>
             )}
@@ -141,16 +165,25 @@ export function RegisterForm() {
             render={({ field }) => (
               <FormItem className="flex flex-row items-start space-x-2 space-y-0">
                 <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="text-sm font-normal">
                     I agree to the{" "}
-                    <Link href="/terms" className="font-medium text-primary hover:underline">
+                    <Link
+                      href="/terms"
+                      className="font-medium text-primary hover:underline"
+                    >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="font-medium text-primary hover:underline">
+                    <Link
+                      href="/privacy"
+                      className="font-medium text-primary hover:underline"
+                    >
                       Privacy Policy
                     </Link>
                   </FormLabel>
@@ -178,7 +211,9 @@ export function RegisterForm() {
           <Separator className="w-full" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+          <span className="bg-card px-2 text-muted-foreground">
+            Or continue with
+          </span>
         </div>
       </div>
 
@@ -223,10 +258,13 @@ export function RegisterForm() {
 
       <div className="text-center text-sm">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-primary hover:underline">
+        <Link
+          href="/login"
+          className="font-medium text-primary hover:underline"
+        >
           Sign in
         </Link>
       </div>
     </div>
-  )
+  );
 }

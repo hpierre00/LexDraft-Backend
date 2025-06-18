@@ -8,40 +8,32 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { documentService } from "@/api/documents";
 
-export function CreateDocument() {
+export function CreateDocument({
+  initialTitle = "",
+  initialContent = "",
+}: {
+  initialTitle?: string;
+  initialContent?: string;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState(initialTitle);
+  const [content, setContent] = useState(initialContent);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          content,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create document");
-      }
-
-      const data = await response.json();
+      const newDocument = await documentService.create({ title, content });
       toast({
         title: "Success!",
         description: "Document created successfully.",
       });
-      router.push(`/documents/${data.id}`);
+      router.push(`/documents/${newDocument.id}`);
     } catch (error) {
       toast({
         title: "Error",

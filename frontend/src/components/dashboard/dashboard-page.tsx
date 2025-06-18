@@ -1,20 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { PlusCircle, Search, ArrowRight, Upload } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { StatsCards } from "@/components/dashboard/stats-cards"
-import { RecentDocuments } from "@/components/dashboard/recent-documents"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { PlusCircle, Search, ArrowRight, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatsCards } from "@/components/dashboard/stats-cards";
+import { RecentDocuments } from "@/components/dashboard/recent-documents";
+import { useAuth } from "@/providers/auth-provider";
 
 export function DashboardPage() {
-  const [userName, setUserName] = useState("Taylor")
+  const { user, isAuthenticated } = useAuth();
+
+  const displayName = user?.first_name || user?.email?.split("@")[0] || "User";
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Good afternoon, {userName}!</h1>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold">
+          {`Good afternoon, ${displayName}!`}
+        </h1>
         <p className="text-muted-foreground">What would you like to work on?</p>
       </div>
 
@@ -54,7 +59,11 @@ export function DashboardPage() {
               <li>Amend any clause with AI</li>
               <li>Ask AI to explain any clause</li>
             </ul>
-            <Button asChild variant="outline" className="mt-4 w-full justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="mt-4 w-full justify-between"
+            >
               <Link href="/import">
                 Upload document <ArrowRight className="h-4 w-4" />
               </Link>
@@ -74,7 +83,11 @@ export function DashboardPage() {
               <li>Search Genie&apos;s 500+ high-quality legal templates</li>
               <li>Create your own private template library</li>
             </ul>
-            <Button asChild variant="outline" className="mt-4 w-full justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="mt-4 w-full justify-between"
+            >
               <Link href="/templates">
                 Browse templates <ArrowRight className="h-4 w-4" />
               </Link>
@@ -83,11 +96,11 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      <div className="mt-8">
+      <div>
         <StatsCards />
       </div>
 
-      <div className="mt-8">
+      <div>
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Recent Documents</h2>
           <Button variant="ghost" size="sm" asChild>
@@ -99,5 +112,5 @@ export function DashboardPage() {
         <RecentDocuments />
       </div>
     </div>
-  )
+  );
 }

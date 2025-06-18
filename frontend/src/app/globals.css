@@ -1,92 +1,98 @@
 @tailwind base;
+
+@custom-variant dark (&:is(.dark *));
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Lawverra Light Theme */
+    --background: 40 33% 96%; /* #faf5ef - cream */
+    --foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%; /* white */
+    --popover-foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --primary: 160 84% 39%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 39 54% 57%; /* #c9a55c - gold */
+    --primary-foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 39 54% 92%; /* #f0e6d6 - light gold */
+    --secondary-foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 39 54% 92%; /* #f0e6d6 - light gold */
+    --muted-foreground: 215 40% 40%; /* lighter navy */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 39 54% 92%; /* #f0e6d6 - light gold */
+    --accent-foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 160 84% 39%;
+    --border: 39 54% 57%; /* #c9a55c - gold */
+    --input: 39 54% 57%; /* #c9a55c - gold */
+    --ring: 39 54% 57%; /* #c9a55c - gold */
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar variables */
+    --sidebar-background: 40 33% 96%; /* #faf5ef - cream */
+    --sidebar-foreground: 215 70% 13%; /* #0a1e3a - navy */
+    --sidebar-primary: 39 54% 57%; /* #c9a55c - gold */
+    --sidebar-primary-foreground: 215 70% 13%; /* #0a1e3a - navy */
+    --sidebar-accent: 39 54% 92%; /* #f0e6d6 - light gold */
+    --sidebar-accent-foreground: 215 70% 13%; /* #0a1e3a - navy */
+    --sidebar-border: 39 54% 57%; /* #c9a55c - gold */
+    --sidebar-ring: 39 54% 57%; /* #c9a55c - gold */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Lawverra Dark Theme */
+    --background: 215 70% 13%; /* #0a1e3a - navy */
+    --foreground: 40 33% 96%; /* #faf5ef - cream */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 215 75% 18%; /* darker navy */
+    --card-foreground: 40 33% 96%; /* #faf5ef - cream */
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 215 75% 18%; /* darker navy */
+    --popover-foreground: 40 33% 96%; /* #faf5ef - cream */
 
-    --primary: 160 84% 39%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 39 54% 57%; /* #c9a55c - gold */
+    --primary-foreground: 215 70% 13%; /* #0a1e3a - navy */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 215 60% 25%; /* medium navy */
+    --secondary-foreground: 40 33% 96%; /* #faf5ef - cream */
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 215 60% 25%; /* medium navy */
+    --muted-foreground: 39 30% 80%; /* lighter gold */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 215 60% 25%; /* medium navy */
+    --accent-foreground: 40 33% 96%; /* #faf5ef - cream */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 40 33% 96%; /* #faf5ef - cream */
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 160 84% 39%;
+    --border: 39 54% 57%; /* #c9a55c - gold */
+    --input: 215 60% 25%; /* medium navy */
+    --ring: 39 54% 57%; /* #c9a55c - gold */
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 240 5.9% 10%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar variables */
+    --sidebar-background: 215 75% 18%; /* darker navy */
+    --sidebar-foreground: 40 33% 96%; /* #faf5ef - cream */
+    --sidebar-primary: 39 54% 57%; /* #c9a55c - gold */
+    --sidebar-primary-foreground: 215 70% 13%; /* #0a1e3a - navy */
+    --sidebar-accent: 215 60% 25%; /* medium navy */
+    --sidebar-accent-foreground: 40 33% 96%; /* #faf5ef - cream */
+    --sidebar-border: 39 54% 57%; /* #c9a55c - gold */
+    --sidebar-ring: 39 54% 57%; /* #c9a55c - gold */
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
@@ -107,4 +113,178 @@
   50% {
     opacity: 0;
   }
+}
+
+/* Lawverra specific colors for direct access */
+:root {
+  --lawverra-navy: #0a1e3a;
+  --lawverra-gold: #c9a55c;
+  --lawverra-cream: #faf5ef;
+  --lawverra-light-gold: #f0e6d6;
+}
+
+/* Toast UI Editor Styles */
+/* These styles are only applied when Toast UI Editor is used */
+.lawverra-editor .toastui-editor-defaultUI {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.lawverra-editor .toastui-editor-defaultUI-toolbar {
+  background-color: var(--lawverra-light-gold);
+  border-bottom: 1px solid var(--lawverra-gold);
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.lawverra-editor .toastui-editor-toolbar-icons {
+  border: 1px solid var(--lawverra-gold);
+  background-color: white;
+}
+
+.lawverra-editor .toastui-editor-toolbar-icons:hover {
+  background-color: var(--lawverra-light-gold);
+  border-color: var(--lawverra-gold);
+}
+
+.lawverra-editor .toastui-editor-toolbar-divider {
+  background-color: var(--lawverra-gold);
+}
+
+.lawverra-editor .toastui-editor-main {
+  background-color: white;
+}
+
+.lawverra-editor .toastui-editor-md-container {
+  background-color: white;
+}
+
+.lawverra-editor .toastui-editor-contents {
+  font-size: 16px;
+  padding: 1rem;
+  color: var(--lawverra-navy);
+}
+
+.lawverra-editor .toastui-editor-defaultUI-toolbar button {
+  border-radius: 0.25rem;
+  margin: 0 2px;
+  color: var(--lawverra-navy);
+}
+
+.lawverra-editor .toastui-editor-defaultUI-toolbar button:hover {
+  background-color: var(--lawverra-light-gold);
+}
+
+.lawverra-editor .toastui-editor-mode-switch {
+  background-color: var(--lawverra-light-gold);
+  border-top: 1px solid var(--lawverra-gold);
+}
+
+.lawverra-editor .toastui-editor-mode-switch .tab-item {
+  color: var(--lawverra-navy);
+}
+
+.lawverra-editor .toastui-editor-mode-switch .tab-item.active {
+  background-color: var(--lawverra-gold);
+  color: var(--lawverra-navy);
+  border-color: var(--lawverra-gold);
+}
+
+.lawverra-editor .toastui-editor-md-code-block-line-background {
+  background-color: var(--lawverra-light-gold);
+}
+
+.lawverra-editor .toastui-editor-md-code {
+  background-color: var(--lawverra-light-gold);
+  color: var(--lawverra-navy);
+}
+
+.lawverra-editor .toastui-editor-contents blockquote {
+  border-left: 4px solid var(--lawverra-gold);
+  background-color: var(--lawverra-light-gold);
+}
+
+.lawverra-editor .toastui-editor-contents h1,
+.lawverra-editor .toastui-editor-contents h2,
+.lawverra-editor .toastui-editor-contents h3,
+.lawverra-editor .toastui-editor-contents h4,
+.lawverra-editor .toastui-editor-contents h5,
+.lawverra-editor .toastui-editor-contents h6 {
+  color: var(--lawverra-navy);
+}
+
+.lawverra-editor .toastui-editor-contents a {
+  color: var(--lawverra-gold);
+}
+
+.lawverra-editor .toastui-editor-contents hr {
+  border-color: var(--lawverra-gold);
+}
+
+.lawverra-editor .toastui-editor-md-preview {
+  background-color: white;
+}
+
+/* Dark mode adjustments */
+.dark .lawverra-editor .toastui-editor-defaultUI-toolbar {
+  background-color: var(--lawverra-navy);
+  border-bottom: 1px solid var(--lawverra-gold);
+}
+
+.dark .lawverra-editor .toastui-editor-main {
+  background-color: var(--lawverra-navy);
+}
+
+.dark .lawverra-editor .toastui-editor-md-container {
+  background-color: var(--lawverra-navy);
+}
+
+.dark .lawverra-editor .toastui-editor-contents {
+  color: var(--lawverra-cream);
+}
+
+.dark .lawverra-editor .toastui-editor-toolbar-icons {
+  border: 1px solid var(--lawverra-gold);
+  background-color: var(--lawverra-navy);
+  color: var(--lawverra-cream);
+}
+
+.dark .lawverra-editor .toastui-editor-toolbar-icons:hover {
+  background-color: #152a4a;
+}
+
+.dark .lawverra-editor .toastui-editor-mode-switch {
+  background-color: var(--lawverra-navy);
+  border-top: 1px solid var(--lawverra-gold);
+}
+
+.dark .lawverra-editor .toastui-editor-mode-switch .tab-item {
+  color: var(--lawverra-cream);
+}
+
+.dark .lawverra-editor .toastui-editor-mode-switch .tab-item.active {
+  background-color: var(--lawverra-gold);
+  color: var(--lawverra-navy);
+}
+
+.dark .lawverra-editor .toastui-editor-md-code-block-line-background {
+  background-color: #152a4a;
+}
+
+.dark .lawverra-editor .toastui-editor-md-code {
+  background-color: #152a4a;
+  color: var(--lawverra-cream);
+}
+
+.dark .lawverra-editor .toastui-editor-contents blockquote {
+  background-color: #152a4a;
+}
+
+.dark .lawverra-editor .toastui-editor-contents h1,
+.dark .lawverra-editor .toastui-editor-contents h2,
+.dark .lawverra-editor .toastui-editor-contents h3,
+.dark .lawverra-editor .toastui-editor-contents h4,
+.dark .lawverra-editor .toastui-editor-contents h5,
+.dark .lawverra-editor .toastui-editor-contents h6 {
+  color: var(--lawverra-cream);
 }

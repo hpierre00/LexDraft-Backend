@@ -26,6 +26,7 @@ const processQueue = (error: any = null, token: string | null = null) => {
 apiClient.interceptors.request.use(
   (config) => {
     const token = authService.getToken();
+    console.log('Request Interceptor: Current Token', token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -62,9 +63,8 @@ apiClient.interceptors.response.use(
         processQueue(null, access_token);
         return apiClient(originalRequest);
       } catch (refreshError) {
+        console.error("Token refresh failed in interceptor:", refreshError);
         processQueue(refreshError, null);
-        authService.logout();
-        window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
