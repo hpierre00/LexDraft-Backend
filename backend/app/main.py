@@ -18,8 +18,8 @@ logging.getLogger("supabase").setLevel(logging.WARNING) # Silence Supabase logs 
 load_dotenv()
 
 app = FastAPI(
-    title="LegalDoc SaaS API",
-    description="API for Legal Document Management System",
+    title="Lawverra API",
+    description="API for Lawverra",
     version=settings.PROJECT_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",

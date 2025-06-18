@@ -17,3 +17,4 @@ class DocumentResponse(BaseModel):
     status: str
     created_at: str
     updated_at: str
+    evaluation_response: Optional[str] = None

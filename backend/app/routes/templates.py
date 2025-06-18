@@ -8,6 +8,7 @@ import io
 import logging
 import traceback
 import os
+from fastapi.responses import Response
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -416,6 +417,61 @@ async def delete_template(
         raise
     except Exception as e:
         logger.error(f"Unexpected error in delete_template: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+
+# Download Template
+@router.get("/{template_id}/download", tags=["Templates"])
+async def download_template(
+    template_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Download a specific template file by ID.
+    """
+    try:
+        logger.info(f"Attempting to download template {template_id} for user {user['id']}")
+
+        # Fetch template details to get file_path and template_name
+        response = supabase.from_("templates").select("file_path, template_name").eq("id", template_id).single().execute()
+
+        if not response.data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Template not found: {template_id}"
+            )
+
+        file_path = response.data["file_path"]
+        template_name = response.data["template_name"]
+
+        # Download file from Supabase storage
+        try:
+            # Supabase storage download returns bytes directly
+            file_bytes = supabase.storage.from_("legal-templates").download(file_path)
+            logger.info(f"Successfully retrieved file bytes for {file_path}")
+            
+            # Determine content type (can be more sophisticated if needed, e.g., using mimetypes)
+            # For .docx files, the standard MIME type is application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" if template_name.endswith(".docx") else "application/octet-stream"
+
+            headers = {
+                "Content-Disposition": f"attachment; filename=\"{template_name}\""
+            }
+            return Response(content=file_bytes, media_type=content_type, headers=headers)
+
+        except Exception as download_error:
+            logger.error(f"Error downloading file from storage {file_path}: {str(download_error)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error downloading template file: {str(download_error)}"
+            )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error in download_template: {str(e)}\n{traceback.format_exc()}")
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error: {str(e)}"

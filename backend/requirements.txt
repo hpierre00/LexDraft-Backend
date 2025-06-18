@@ -1,3 +1,8 @@
+--index-url https://pypi.org/simple
+--trusted-host pypi.org
+--trusted-host files.pythonhosted.org
+
+
 fastapi>=0.95.2
 uvicorn>=0.21.1
 supabase>=1.0.0
@@ -6,11 +11,12 @@ httpx>=0.23.3
 pydantic>=1.10.6
 python-multipart>=0.0.17
 pydantic-settings>=2.6.1
-pypdf>=5.5.0
 python-docx>=1.1.2
-PyPDF2>=3.0.1
 langchain-community>=0.3.24
 openai>=1.61.1
 stripe>=12.1.0
 PyYAML>=5.4.1 --only-binary :all:
 langchain_openai
+markdown
+reportlab==4.1.0
+beautifulsoup4==4.12.3

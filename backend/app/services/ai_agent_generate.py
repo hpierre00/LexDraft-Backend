@@ -39,26 +39,26 @@ def generate_legal_document(
     try:
         # Construct system message with template context if available
         if template_content and state_name and document_type:
-            system_message = f"""You are a legal document generator. Use the following template as context for generating a {document_type} for {state_name}.
+            system_message = f"""You are a legal document generator. You *must* generate all content in Markdown format. Use the following template as context for generating a {document_type} for {state_name}.
 
 Template Content:
 {template_content}
 
-IMPORTANT FORMATTING RULES:
+IMPORTANT FORMATTING RULES (in Markdown):
 1. Use proper legal document structure:
-   - Title (centered, bold, all caps)
-   - Parties section (numbered)
-   - Recitals/Whereas clauses (if applicable)
-   - Main body (numbered sections)
-   - Signature blocks (properly formatted)
+   - Title (centered, bold, all caps, e.g., `# <center>**TITLE**</center>`)
+   - Parties section (numbered list, e.g., `1. Party A: ...`)
+   - Recitals/Whereas clauses (if applicable, e.g., `WHEREAS, ...`)
+   - Main body (numbered sections using Markdown headers, e.g., `## 1. Section Title`)
+   - Signature blocks (properly formatted with Markdown, e.g., `**[SIGNATURE LINE]**`)
    - Notary section (if required)
 
 2. Formatting requirements:
-   - Use consistent indentation
-   - Number all sections and subsections
+   - Use consistent indentation (Markdown lists and code blocks)
+   - Number all sections and subsections using Markdown headers (e.g., `#`, `##`, `###`)
    - Use proper legal terminology
-   - Include proper spacing between sections
-   - Use proper paragraph breaks
+   - Include proper spacing between sections (empty lines in Markdown)
+   - Use proper paragraph breaks (double newline for new paragraphs)
    - Format dates as "Month Day, Year"
    - Use proper legal citations if needed
 
@@ -66,8 +66,8 @@ IMPORTANT FORMATTING RULES:
    - Follow the template's structure exactly
    - Maintain all essential legal clauses
    - Ensure state-specific compliance
-   - Include proper definitions
-   - Add clear section headers
+   - Include proper definitions (e.g., `**Definition**: ...`)
+   - Add clear section headers using Markdown
    - Use proper legal language
 
 4. Document sections must include:
@@ -82,31 +82,31 @@ IMPORTANT FORMATTING RULES:
 Follow the structure and key clauses from the template while incorporating the user's specific requirements.
 Ensure the generated document complies with {state_name} laws and regulations."""
         else:
-            system_message = """You are a legal document generator. Generate a comprehensive legal document based on the user's requirements.
+            system_message = """You are a legal document generator. You *must* generate all content in Markdown format. Generate a comprehensive legal document based on the user's requirements.
 
-IMPORTANT FORMATTING RULES:
+IMPORTANT FORMATTING RULES (in Markdown):
 1. Use proper legal document structure:
-   - Title (centered, bold, all caps)
-   - Parties section (numbered)
-   - Recitals/Whereas clauses (if applicable)
-   - Main body (numbered sections)
-   - Signature blocks (properly formatted)
+   - Title (centered, bold, all caps, e.g., `# <center>**TITLE**</center>`)
+   - Parties section (numbered list, e.g., `1. Party A: ...`)
+   - Recitals/Whereas clauses (if applicable, e.g., `WHEREAS, ...`)
+   - Main body (numbered sections using Markdown headers, e.g., `## 1. Section Title`)
+   - Signature blocks (properly formatted with Markdown, e.g., `**[SIGNATURE LINE]**`)
    - Notary section (if required)
 
 2. Formatting requirements:
-   - Use consistent indentation
-   - Number all sections and subsections
+   - Use consistent indentation (Markdown lists and code blocks)
+   - Number all sections and subsections using Markdown headers (e.g., `#`, `##`, `###`)
    - Use proper legal terminology
-   - Include proper spacing between sections
-   - Use proper paragraph breaks
+   - Include proper spacing between sections (empty lines in Markdown)
+   - Use proper paragraph breaks (double newline for new paragraphs)
    - Format dates as "Month Day, Year"
    - Use proper legal citations if needed
 
 3. Content requirements:
    - Include all essential legal clauses
    - Use proper legal language
-   - Add clear section headers
-   - Include proper definitions
+   - Add clear section headers using Markdown
+   - Include proper definitions (e.g., `**Definition**: ...`)
    - Ensure comprehensive coverage of the subject matter
 
 4. Document sections must include:
@@ -125,7 +125,7 @@ Generate a professional legal document that is clear, comprehensive, and legally
 Title: {title}
 Specific Requirements: {prompt}
 
-Ensure proper formatting and structure as specified in the system message."""
+Ensure proper formatting and structure as specified in the system message, and ensure the entire response is in Markdown format."""
 
         # Call OpenAI API with increased max_tokens for proper formatting
         response = client.chat.completions.create(
@@ -144,24 +144,24 @@ Ensure proper formatting and structure as specified in the system message."""
         content = response.choices[0].message.content
         
         # Ensure proper spacing and formatting
-        content = content.replace("\n\n\n", "\n\n")  # Remove excessive newlines
-        content = content.replace("  ", " ")  # Remove double spaces
+        # content = content.replace("\n\n\n", "\n\n")  # Remove excessive newlines
+        # content = content.replace("  ", " ")  # Remove double spaces
         
-        # Ensure proper section numbering
-        lines = content.split("\n")
-        formatted_lines = []
-        section_number = 1
-        subsection_number = 1
+        # # Ensure proper section numbering
+        # lines = content.split("\n")
+        # formatted_lines = []
+        # section_number = 1
+        # subsection_number = 1
         
-        for line in lines:
-            if line.strip().startswith("Section") or line.strip().startswith("ARTICLE"):
-                formatted_lines.append(f"\n{line.strip()}")
-            elif line.strip().startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
-                formatted_lines.append(f"\n{line.strip()}")
-            else:
-                formatted_lines.append(line.strip())
+        # for line in lines:
+        #     if line.strip().startswith("Section") or line.strip().startswith("ARTICLE"):
+        #         formatted_lines.append(f"\n{line.strip()}")
+        #     elif line.strip().startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
+        #         formatted_lines.append(f"\n{line.strip()}")
+        #     else:
+        #         formatted_lines.append(line.strip())
         
-        content = "\n".join(formatted_lines)
+        # content = "\n".join(formatted_lines)
         
         return content
 

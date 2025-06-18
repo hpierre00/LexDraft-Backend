@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS documents (
     title TEXT NOT NULL,
     content TEXT,
     status TEXT DEFAULT 'active',
+    evaluation_response TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, Form
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, Form, Body
 from fastapi.security import HTTPAuthorizationCredentials
 from app.services.ai_agent_generate import generate_legal_document
 from app.services.ai_agent_evaluate import evaluate_legal_document
@@ -17,10 +17,10 @@ router = APIRouter()
 
 @router.post("/generate-document", tags=["AI Agents"])
 async def generate_document(
-    prompt: str = Form(...),
-    title: str = Form(...),
-    state_id: str = Form(None),
-    document_type_id: str = Form(None),
+    prompt: str = Body(..., embed=True),
+    title: str = Body(..., embed=True),
+    state_id: str = Body(None, embed=True),
+    document_type_id: str = Body(None, embed=True),
     user: dict = Depends(get_current_user),
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> Dict[str, Any]:

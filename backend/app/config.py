@@ -5,7 +5,7 @@ from typing import List, Optional
 class Settings(BaseSettings):
     PROJECT_NAME: str = "LegalDoc SaaS"
     PROJECT_VERSION: str = "1.0.0"
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://lexdraft.netlify.app"]  # Explicitly allow local and Netlify frontends
 
     # Server configuration
     HOST: str = "127.0.0.1"
@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True # Keep if needed, but Stripe vars are usually upper
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        # Ensure FRONTEND_URL is always in CORS_ORIGINS if it's different and not already there
+        if self.FRONTEND_URL and self.FRONTEND_URL not in self.CORS_ORIGINS:
+            self.CORS_ORIGINS.append(self.FRONTEND_URL)
 
 settings = Settings()
 
