@@ -206,7 +206,7 @@ export function RegisterForm() {
         </form>
       </Form>
 
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <Separator className="w-full" />
         </div>
@@ -215,9 +215,9 @@ export function RegisterForm() {
             Or continue with
           </span>
         </div>
-      </div>
+      </div> */}
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-2 gap-4">
         <Button variant="outline" type="button" disabled={isLoading}>
           <svg
             className="mr-2 h-4 w-4"
@@ -254,7 +254,7 @@ export function RegisterForm() {
           </svg>
           Microsoft
         </Button>
-      </div>
+      </div> */}
 
       <div className="text-center text-sm">
         Already have an account?{" "}

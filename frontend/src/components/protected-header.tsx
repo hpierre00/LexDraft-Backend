@@ -42,10 +42,12 @@ export function ProtectedHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                Profile
-              </Link>
+                <span className="hidden md:inline">
+                  {user?.first_name || user?.email || "User"}
+                </span>
+              </div>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/settings" className="flex items-center gap-2">

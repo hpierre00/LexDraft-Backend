@@ -43,10 +43,12 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="border-b sticky top-0 z-10 h-16">
-        <div className="flex items-center gap-2 px-4 py-3">
-          <Logo size="sm" />
-          <span className="text-xl font-bold">Lawverra</span>
-        </div>
+        <Link href="/">
+          <div className="flex items-center gap-2 px-4 py-3">
+            <Logo size="sm" />
+            <span className="text-xl font-bold">Lawverra</span>
+          </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
@@ -97,7 +99,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild isActive={isActive("/create")}>
                   <Link href="/create">
                     <PlusCircle className="text-primary" />
-                    <span>Create Empty</span>
+                    <span>Create a Document</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -29,11 +29,11 @@ export default function HeroSection() {
               <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
                 <AnimatedGroup>
                   <Link
-                    href="#link"
+                    href="/register"
                     className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
                   >
                     <span className="text-foreground text-sm">
-                      Contact Our Team To Work With Us
+                      Create an Account To Work With Us
                     </span>
                     <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
                     <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
@@ -64,8 +64,8 @@ export default function HeroSection() {
                   delay={2000}
                 />
 
-                <AnimatedGroup className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
-                  <div className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
+                <AnimatedGroup className="mt-12 mb-6 flex flex-col items-center justify-center gap-2 md:flex-row">
+                  <div className="rounded-[calc(var(--radius-xl)+0.125rem)] p-0.5">
                     <Button
                       asChild
                       size="lg"
@@ -73,6 +73,7 @@ export default function HeroSection() {
                     >
                       <Link href="/register">
                         <span className="text-nowrap">Start Building</span>
+                        <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1" />
                       </Link>
                     </Button>
                   </div>
