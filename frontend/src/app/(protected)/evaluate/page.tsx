@@ -18,6 +18,7 @@ export default function EvaluateDocumentPage() {
   const [evaluationResult, setEvaluationResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleEvaluate = async () => {
     setIsLoading(true);
@@ -25,13 +26,24 @@ export default function EvaluateDocumentPage() {
     setEvaluationResult("");
 
     try {
-      if (documentContent.trim() === "") {
+      let contentToEvaluate = documentContent;
+
+      if (selectedFile) {
+        // Upload the file to the backend for content extraction
+        const uploadResponse = await documentService.upload(selectedFile);
+        if (uploadResponse.content) {
+          contentToEvaluate = uploadResponse.content;
+          setDocumentContent(uploadResponse.content); // Update the textarea with extracted content
+        } else {
+          throw new Error("Failed to extract content from the uploaded file.");
+        }
+      } else if (documentContent.trim() === "") {
         throw new Error("Document content cannot be empty.");
       }
 
       const response = await documentService.create({
         title: "Evaluation Document - " + new Date().toLocaleString(),
-        content: documentContent,
+        content: contentToEvaluate,
       });
 
       if (response.evaluation_response) {
@@ -73,24 +85,21 @@ export default function EvaluateDocumentPage() {
           <div className="flex items-center space-x-2 mt-4">
             <Input
               type="file"
-              onChange={async (e) => {
+              onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  const reader = new FileReader();
-                  reader.onload = (event) => {
-                    setDocumentContent(event.target?.result as string);
-                  };
-                  reader.readAsText(file);
+                  setSelectedFile(file);
+                  setDocumentContent(""); // Clear manual input when file is selected
                 }
               }}
               className="flex-grow"
             />
             <Button
               onClick={handleEvaluate}
-              disabled={isLoading}
+              disabled={isLoading || (!documentContent.trim() && !selectedFile)}
               className="ml-auto"
             >
-              {isLoading ? "Evaluating..." : "Evaluate Document"}
+              {isLoading ? "Evaluating..." : "Preview & Evaluate Document"}
             </Button>
           </div>
         </CardContent>

@@ -234,7 +234,31 @@ export function DocumentEditor({ documentId }: { documentId: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Document options</DropdownMenuLabel>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  if (document) {
+                    try {
+                      await documentService.downloadDocx(document.id);
+                      toast({
+                        title: "Document exported",
+                        description:
+                          "Your document has been exported as a Word file.",
+                      });
+                    } catch (error) {
+                      console.error(
+                        "Failed to export document as DOCX:",
+                        error
+                      );
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description:
+                          "Failed to export document as Word. Please try again.",
+                      });
+                    }
+                  }
+                }}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 Export as Word
               </DropdownMenuItem>

@@ -18,6 +18,8 @@ from starlette.background import BackgroundTask # Import BackgroundTask
 from app.services.ai_agent_evaluate import evaluate_legal_document # Import the evaluation function
 from reportlab.lib import colors
 from bs4 import BeautifulSoup
+from docx import Document as DocxDocument # Import python-docx
+from PyPDF2 import PdfReader # Import PyPDF2
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -303,6 +305,68 @@ async def download_document(
             detail=f"Internal server error: {str(e)}"
         )
 
+@router.get("/{document_id}/download-docx", tags=["Documents"])
+async def download_document_docx(
+    document_id: str,
+    user: dict = Depends(get_current_user)
+) -> FileResponse:
+    """
+    Download a specific document by ID as a DOCX file.
+    """
+    temp_file_docx_path = ""
+    try:
+        logger.info(f"Downloading document {document_id} for user {user['id']} as DOCX.")
+        
+        response = supabase.from_("documents").select("title", "content").eq("id", document_id).single().execute()
+        
+        if not response.data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Document not found: {document_id}"
+            )
+        
+        document_title = response.data["title"]
+        document_content = response.data["content"]
+        
+        # Create a new DOCX document
+        doc = DocxDocument()
+        doc.add_heading(document_title, level=1)
+        
+        # Add content, assuming it's plain text or markdown that can be directly added
+        # For more complex markdown to docx conversion, a dedicated library would be needed
+        doc.add_paragraph(document_content)
+        
+        # Create a temporary DOCX file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as temp_file_docx:
+            temp_file_docx_path = temp_file_docx.name
+            doc.save(temp_file_docx_path)
+
+        # Define a cleanup function to delete the temporary file after the response is sent
+        def cleanup():
+            os.remove(temp_file_docx_path)
+            logger.info(f"Temporary DOCX file {temp_file_docx_path} cleaned up.")
+
+        file_name = f"{document_title.replace(' ', '_')}.docx"
+        return FileResponse(
+            path=temp_file_docx_path,
+            filename=file_name,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            background=BackgroundTask(cleanup)
+        )
+
+    except HTTPException:
+        if os.path.exists(temp_file_docx_path):
+            os.remove(temp_file_docx_path)
+        raise
+    except Exception as e:
+        logger.critical(f"Critical error in download_document_docx: {str(e)}\n{traceback.format_exc()}")
+        if os.path.exists(temp_file_docx_path):
+            os.remove(temp_file_docx_path)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+
 # Upload Evaluation
 @router.post("/upload", tags=["Documents"], response_model=DocumentResponse)
 async def upload_document_for_evaluation(
@@ -310,47 +374,84 @@ async def upload_document_for_evaluation(
     user: dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
-    Upload a document for evaluation. The content of the file will be saved.
+    Upload a document (PDF or DOCX) for content extraction and evaluation.
     """
+    temp_file_path = ""
     try:
-        logger.info(f"User {user['id']} attempting to upload file: {file.filename}")
+        logger.info(f"Received upload request for file: {file.filename}")
         
-        # Read file content
-        content = await file.read()
-        decoded_content = content.decode("utf-8")
-        logger.debug(f"File {file.filename} content decoded.")
+        # Save the uploaded file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename.split(".")[-1]) as temp_file:
+            temp_file.write(await file.read())
+            temp_file_path = temp_file.name
+        logger.info(f"File saved temporarily to: {temp_file_path}")
 
-        # Use the uploaded filename as the document title
-        document_title = file.filename.split(".")[0] if "." in file.filename else file.filename
-        logger.debug(f"Document title derived: {document_title}")
+        extracted_content = ""
+        file_extension = file.filename.split(".")[-1].lower()
 
-        # Perform AI evaluation
-        logger.info(f"Initiating AI evaluation for document: {document_title}")
-        evaluation_response = evaluate_legal_document(document_content=decoded_content)
-        logger.info(f"AI evaluation completed for document: {document_title}")
+        if file_extension == "pdf":
+            logger.info(f"Processing PDF file: {file.filename}")
+            try:
+                reader = PdfReader(temp_file_path)
+                for page in reader.pages:
+                    extracted_content += page.extract_text() or ""
+                logger.info("PDF content extracted successfully.")
+            except Exception as e:
+                logger.error(f"Error extracting text from PDF: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error processing PDF file: {str(e)}")
+        elif file_extension == "docx":
+            logger.info(f"Processing DOCX file: {file.filename}")
+            try:
+                doc = DocxDocument(temp_file_path)
+                for paragraph in doc.paragraphs:
+                    extracted_content += paragraph.text + "\n"
+                logger.info("DOCX content extracted successfully.")
+            except Exception as e:
+                logger.error(f"Error extracting text from DOCX: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error processing DOCX file: {str(e)}")
+        else:
+            logger.warning(f"Unsupported file type uploaded: {file.filename}")
+            raise HTTPException(
+                status_code=400,
+                detail="Unsupported file type. Please upload a PDF or DOCX file."
+            )
+        
+        if not extracted_content.strip():
+            raise HTTPException(status_code=400, detail="No content extracted from the document.")
 
+        # Save the extracted content as a new document in Supabase
         document_data = {
             "user_id": user["id"],
-            "title": document_title,
-            "content": decoded_content,
-            "status": "for_evaluation", # You might want a specific status for uploaded documents
-            "evaluation_response": evaluation_response # Add evaluation response
+            "title": file.filename, # Use filename as title for uploaded docs
+            "content": extracted_content,
+            "status": "uploaded" # You might want a specific status for uploaded docs
         }
-        logger.debug("Document data prepared for Supabase insertion.")
-
         response = supabase.from_("documents").insert(document_data).execute()
-        logger.info(f"Document uploaded and saved to Supabase: {response.data[0]['id']}")
-        return response.data[0]
+        created_document = response.data[0]
+        logger.info(f"Uploaded document saved to Supabase with ID: {created_document['id']}")
 
-    except UnicodeDecodeError:
-        logger.error(f"File decoding error for user {user['id']} file {file.filename}")
-        raise HTTPException(status_code=400, detail="Could not decode file content. Please ensure it's a valid text file (e.g., Markdown or plain text).")
+        # Perform AI evaluation on the extracted content
+        logger.info(f"Evaluating uploaded document {created_document['id']} with AI.")
+        ai_evaluation_response = await evaluate_legal_document(document_content=extracted_content)
+        logger.info(f"AI evaluation complete for uploaded document {created_document['id']}.")
+
+        # Update the document with the evaluation response
+        updated_response = supabase.from_("documents").update(
+            {"evaluation_response": ai_evaluation_response}
+        ).eq("id", created_document['id']).execute()
+
+        # Return the updated document data including the evaluation response
+        return updated_response.data[0]
+
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Unexpected error in upload_document_for_evaluation: {str(e)}\n{traceback.format_exc()}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
+        logger.error(f"Unexpected error during file upload and processing: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    finally:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+            logger.info(f"Cleaned up temporary file: {temp_file_path}")
 
 # Update Document
 @router.put("/{document_id}", tags=["Documents"], response_model=DocumentResponse)
