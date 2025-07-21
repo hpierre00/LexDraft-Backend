@@ -4,6 +4,8 @@ from docx import Document
 from dotenv import load_dotenv
 from app.models.database import supabase
 from app.config import settings
+from app.models.schemas import DocumentType, AreaOfLaw
+from typing import Optional
 
 # Load environment variables
 load_dotenv()
@@ -13,7 +15,7 @@ if not openai_api_key:
     raise ValueError("Missing OPENAI_API_KEY in .env file")
 
 # Initialize GPT-4.5 Turbo
-llm = ChatOpenAI(model_name="gpt-4.5-turbo", temperature=0.5)
+llm = ChatOpenAI(model_name="gpt-4.1", temperature=0.5)
 
 def fetch_template_from_supabase(template_path: str) -> str:
     """
@@ -88,3 +90,35 @@ def edit_template_with_ai(template_path: str, user_command: str, user_id: str, t
         return storage_path
     except Exception as e:
         raise RuntimeError(f"Error editing template: {str(e)}")
+
+def get_template_content_by_criteria(
+    document_type: DocumentType,
+    area_of_law: AreaOfLaw,
+    jurisdiction: Optional[str] = None
+) -> Optional[str]:
+    """
+    Fetches a document template from Supabase based on document type, area of law, and optional jurisdiction.
+
+    Parameters:
+    - document_type (DocumentType): The type of document.
+    - area_of_law (AreaOfLaw): The area of law.
+    - jurisdiction (Optional[str]): The jurisdiction for the template (e.g., 'Florida').
+
+    Returns:
+    - Optional[str]: The content of the template if found, otherwise None.
+    """
+    try:
+        query = supabase.from_("document_templates").select("template_text").eq("document_type", document_type.value).eq("area_of_law", area_of_law.value)
+        
+        if jurisdiction:
+            query = query.eq("jurisdiction", jurisdiction)
+        
+        # Order by created_at descending to get the latest template if multiple match
+        response = query.order("created_at", desc=True).limit(1).execute()
+
+        if response.data and len(response.data) > 0:
+            return response.data[0]["template_text"]
+        else:
+            return None
+    except Exception as e:
+        raise RuntimeError(f"Error fetching template by criteria: {str(e)}")

@@ -4,8 +4,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from supabase import Client
 from app.models.database import supabase
 import logging
+from app.utils.db_utils import get_profile
 
-logging.basicConfig(level=logging.DEBUG)
+# Remove debug logging configuration - use main.py configuration
 
 # Configure Bearer token scheme
 security = HTTPBearer(
@@ -14,15 +15,14 @@ security = HTTPBearer(
     auto_error=True
 )
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """
     Dependency to get current authenticated user
     """
     try:
         token = credentials.credentials
-        logging.debug(f"Received token: {token}")  # Log the token
+        # Removed debug logging for security
         user_response = supabase.auth.get_user(token)
-        logging.debug(f"Supabase user response: {user_response}")  # Log the response
 
         # Check if the response contains a valid user
         if not user_response or not user_response.user:
@@ -33,11 +33,19 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
             )
         
         # Return a dictionary with only serializable fields
-        return {
+        user_data = {
             "id": user_response.user.id,
             "email": user_response.user.email,
             "email_confirmed": user_response.user.email_confirmed_at is not None
         }
+
+        # Fetch profile to get the role and admin status
+        profile = await get_profile(user_response.user.id)
+        if profile:
+            user_data["role"] = profile.get("role", "self") # Default to 'self' if role not explicitly set
+            user_data["is_admin"] = profile.get("is_admin", False)
+
+        return user_data
     except Exception as e:
         logging.error(f"Error validating token: {e}")  # Log the error
         raise HTTPException(

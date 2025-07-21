@@ -22,3 +22,13 @@ reportlab==4.1.0
 beautifulsoup4==4.12.3
 python-docx
 PyPDF2
+langchain
+openai
+tiktoken
+python-multipart  # For file uploads
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+pypdf
+python-docx
+email-validator

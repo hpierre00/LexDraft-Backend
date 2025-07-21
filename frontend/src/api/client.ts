@@ -22,6 +22,9 @@ const processQueue = (error: any = null, token: string | null = null) => {
   failedQueue = [];
 };
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000; // Initial delay of 1 second
+
 // Request interceptor for adding auth token
 apiClient.interceptors.request.use(
   (config) => {
@@ -40,6 +43,21 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    originalRequest._retryCount = originalRequest._retryCount || 0;
+
+    // Check for network errors (e.g., no internet, connection refused) or 5xx server errors
+    if (
+      (error.code === 'ECONNABORTED' || error.message === 'Network Error' || (error.response && error.response.status >= 500)) &&
+      originalRequest._retryCount < MAX_RETRIES
+    ) {
+      originalRequest._retryCount++;
+      const delay = RETRY_DELAY_MS * Math.pow(2, originalRequest._retryCount - 1); // Exponential backoff
+      console.log(`Retrying request ${originalRequest.url} (Attempt ${originalRequest._retryCount}/${MAX_RETRIES}) after ${delay}ms`);
+
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(apiClient(originalRequest)), delay);
+      });
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -65,6 +83,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         console.error("Token refresh failed in interceptor:", refreshError);
         processQueue(refreshError, null);
+        authService.logout(); // Explicitly log out the user
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

@@ -9,6 +9,7 @@ import logging
 import traceback
 import os
 from fastapi.responses import Response
+import json
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -476,3 +477,151 @@ async def download_template(
             status_code=500,
             detail=f"Internal server error: {str(e)}"
         )
+
+@router.post("/upload-multi", tags=["Templates"])
+async def upload_multiple_templates(
+    files: Optional[List[UploadFile]] = File(None),
+    templates_data: Optional[str] = Form(None),
+    user: dict = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+) -> Dict[str, Any]:
+    """
+    Upload multiple templates via files or create them from provided content.
+
+    The `templates_data` should be a JSON string of a list of dictionaries,
+    each containing 'state', 'document_type', 'template_name', and 'content'.
+
+    Example file upload:
+    ```
+    files: [template1.docx, template2.docx]
+    ```
+
+    Example content submission:
+    ```
+    templates_data: '[
+        {"state": "California", "document_type": "Non-Disclosure Agreement", "template_name": "NDA_Content_1", "content": "Content for NDA 1"},
+        {"state": "Texas", "document_type": "Employment Contract", "template_name": "Employment_Content_1", "content": "Content for Employment 1"}
+    ]'
+    ```
+    """
+    uploaded_templates_info = []
+
+    if files:
+        for file in files:
+            if not file.filename.endswith('.docx'):
+                logger.warning(f"Skipping {file.filename}: Only .docx files are supported for upload.")
+                uploaded_templates_info.append({"filename": file.filename, "status": "skipped", "reason": "Only .docx files are supported"})
+                continue
+
+            try:
+                # Extract content from DOCX
+                content = ""
+                file_content = await file.read()
+                doc = Document(io.BytesIO(file_content))
+                content = "\n".join([para.text for para in doc.paragraphs])
+                logger.info(f"Extracted content from {file.filename}")
+
+                # Determine state and document type from filename or metadata if available
+                # For simplicity, let's assume state and document type are part of the filename or default
+                # You might need a more sophisticated way to infer this or require it as part of form data
+                # For now, we'll use a placeholder or extract from filename if possible
+                state_name = "Unknown State"
+                doc_type_name = "Unknown Document Type"
+                
+                # Attempt to extract state and document type from filename (basic example)
+                name_parts = file.filename.replace('.docx', '').split('-')
+                if len(name_parts) > 1:
+                    state_name = name_parts[0]
+                    doc_type_name = "-".join(name_parts[1:])
+
+                state_response = supabase.from_("states").select("state_id").eq("state_name", state_name).single().execute()
+                if not state_response.data:
+                    logger.warning(f"State '{state_name}' not found for {file.filename}. Skipping.")
+                    uploaded_templates_info.append({"filename": file.filename, "status": "skipped", "reason": f"Invalid state: {state_name}"})
+                    continue
+                state_id = state_response.data["state_id"]
+
+                doc_type_response = supabase.from_("document_types").select("document_type_id").ilike("document_type_name", doc_type_name).single().execute()
+                if not doc_type_response.data:
+                    logger.warning(f"Document type '{doc_type_name}' not found for {file.filename}. Skipping.")
+                    uploaded_templates_info.append({"filename": file.filename, "status": "skipped", "reason": f"Invalid document type: {doc_type_name}"})
+                    continue
+                doc_type_id = doc_type_response.data["document_type_id"]
+
+                storage_path = f"legal-templates/{state_name}/{doc_type_name}/{file.filename}"
+                
+                # Upload to Supabase storage
+                supabase.storage.from_("legal-templates").upload(storage_path, file_content, {"content-type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
+                logger.info(f"File uploaded to storage: {storage_path}")
+
+                # Insert into database
+                template_data = {
+                    "state_id": state_id,
+                    "document_type_id": doc_type_id,
+                    "template_name": file.filename,
+                    "file_path": storage_path,
+                    "content": content
+                }
+                response = supabase.from_("templates").insert(template_data).execute()
+                uploaded_templates_info.append({"filename": file.filename, "status": "success", "template_id": response.data[0]['id'], "file_path": storage_path})
+                logger.info(f"Template registered in database: {response.data[0]['id']}")
+
+            except Exception as e:
+                logger.error(f"Error processing file {file.filename}: {str(e)}\n{traceback.format_exc()}")
+                uploaded_templates_info.append({"filename": file.filename, "status": "failed", "reason": str(e)})
+
+    if templates_data:
+        try:
+            templates_to_create = json.loads(templates_data)
+            for template_item in templates_to_create:
+                state = template_item.get("state")
+                document_type = template_item.get("document_type")
+                template_name = template_item.get("template_name")
+                content = template_item.get("content")
+
+                if not all([state, document_type, template_name, content]):
+                    logger.warning(f"Skipping template item due to missing data: {template_item}")
+                    uploaded_templates_info.append({"template_item": template_item, "status": "skipped", "reason": "Missing required fields"})
+                    continue
+                
+                try:
+                    state_response = supabase.from_("states").select("state_id").eq("state_name", state).single().execute()
+                    if not state_response.data:
+                        logger.warning(f"State '{state}' not found for template '{template_name}'. Skipping.")
+                        uploaded_templates_info.append({"template_name": template_name, "status": "skipped", "reason": f"Invalid state: {state}"})
+                        continue
+                    state_id = state_response.data["state_id"]
+
+                    doc_type_response = supabase.from_("document_types").select("document_type_id").ilike("document_type_name", document_type).single().execute()
+                    if not doc_type_response.data:
+                        logger.warning(f"Document type '{document_type}' not found for template '{template_name}'. Skipping.")
+                        uploaded_templates_info.append({"template_name": template_name, "status": "skipped", "reason": f"Invalid document type: {document_type}"})
+                        continue
+                    doc_type_id = doc_type_response.data["document_type_id"]
+
+                    # For directly provided content, no file upload to storage, just DB entry
+                    template_db_data = {
+                        "state_id": state_id,
+                        "document_type_id": doc_type_id,
+                        "template_name": template_name,
+                        "file_path": None, # No file path for directly provided content
+                        "content": content
+                    }
+                    response = supabase.from_("templates").insert(template_db_data).execute()
+                    uploaded_templates_info.append({"template_name": template_name, "status": "success", "template_id": response.data[0]['id']})
+                    logger.info(f"Template (content-based) registered in database: {response.data[0]['id']}")
+
+                except Exception as e:
+                    logger.error(f"Error processing content-based template {template_name}: {str(e)}\n{traceback.format_exc()}")
+                    uploaded_templates_info.append({"template_name": template_name, "status": "failed", "reason": str(e)})
+
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON format for templates_data.")
+        except Exception as e:
+            logger.error(f"Unexpected error processing templates_data: {str(e)}\n{traceback.format_exc()}")
+            raise HTTPException(status_code=500, detail=f"Internal server error processing templates_data: {str(e)}")
+
+    if not files and not templates_data:
+        raise HTTPException(status_code=400, detail="No files or template data provided.")
+
+    return {"message": "Template upload/creation process completed.", "results": uploaded_templates_info}

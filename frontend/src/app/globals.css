@@ -123,168 +123,280 @@
   --lawverra-light-gold: #f0e6d6;
 }
 
-/* Toast UI Editor Styles */
-/* These styles are only applied when Toast UI Editor is used */
+/* Toast UI Editor Styles - Theme Aware */
 .lawverra-editor .toastui-editor-defaultUI {
   border: none;
   border-radius: 0.5rem;
+  background-color: hsl(var(--background));
 }
 
+/* Toolbar */
 .lawverra-editor .toastui-editor-defaultUI-toolbar {
-  background-color: var(--lawverra-light-gold);
-  border-bottom: 1px solid var(--lawverra-gold);
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
+  color: hsl(var(--foreground));
 }
 
 .lawverra-editor .toastui-editor-toolbar-icons {
-  border: 1px solid var(--lawverra-gold);
-  background-color: white;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .lawverra-editor .toastui-editor-toolbar-icons:hover {
-  background-color: var(--lawverra-light-gold);
-  border-color: var(--lawverra-gold);
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--accent-foreground));
 }
 
 .lawverra-editor .toastui-editor-toolbar-divider {
-  background-color: var(--lawverra-gold);
+  background-color: hsl(var(--border));
 }
 
+/* Main editor area */
 .lawverra-editor .toastui-editor-main {
-  background-color: white;
+  background-color: hsl(var(--background));
 }
 
 .lawverra-editor .toastui-editor-md-container {
-  background-color: white;
+  background-color: hsl(var(--background));
 }
 
+.lawverra-editor .toastui-editor-md-preview {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Content styling */
 .lawverra-editor .toastui-editor-contents {
   font-size: 16px;
   padding: 1rem;
-  color: var(--lawverra-navy);
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--background)) !important;
+  line-height: 1.6;
 }
 
+/* Fix editor content text in edit mode */
+.lawverra-editor .toastui-editor-md-container .toastui-editor-contents,
+.lawverra-editor .toastui-editor-md-container .CodeMirror,
+.lawverra-editor .toastui-editor-md-container .CodeMirror-lines,
+.lawverra-editor .toastui-editor-md-container .CodeMirror-line,
+.lawverra-editor .toastui-editor-md-container .cm-s-default {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Fix CodeMirror (markdown editor) text color */
+.lawverra-editor .CodeMirror {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+.lawverra-editor .CodeMirror-lines {
+  color: hsl(var(--foreground)) !important;
+}
+
+.lawverra-editor .CodeMirror-line span {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Fix specific CodeMirror syntax highlighting */
+.lawverra-editor .cm-header { color: hsl(var(--foreground)) !important; font-weight: 600; }
+.lawverra-editor .cm-strong { color: hsl(var(--foreground)) !important; font-weight: bold; }
+.lawverra-editor .cm-em { color: hsl(var(--foreground)) !important; font-style: italic; }
+.lawverra-editor .cm-link { color: hsl(var(--primary)) !important; }
+.lawverra-editor .cm-url { color: hsl(var(--primary)) !important; }
+.lawverra-editor .cm-quote { color: hsl(var(--muted-foreground)) !important; }
+.lawverra-editor .cm-code { color: hsl(var(--foreground)) !important; background-color: hsl(var(--muted)) !important; }
+
+/* Toolbar buttons */
 .lawverra-editor .toastui-editor-defaultUI-toolbar button {
   border-radius: 0.25rem;
   margin: 0 2px;
-  color: var(--lawverra-navy);
+  color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease;
 }
 
 .lawverra-editor .toastui-editor-defaultUI-toolbar button:hover {
-  background-color: var(--lawverra-light-gold);
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
 }
 
+.lawverra-editor .toastui-editor-defaultUI-toolbar button.active {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border-color: hsl(var(--primary)) !important;
+}
+
+/* Ensure all toolbar button text and icons are properly colored */
+.lawverra-editor .toastui-editor-defaultUI-toolbar button,
+.lawverra-editor .toastui-editor-defaultUI-toolbar button span,
+.lawverra-editor .toastui-editor-defaultUI-toolbar button::before,
+.lawverra-editor .toastui-editor-defaultUI-toolbar button::after {
+  color: hsl(var(--foreground)) !important;
+}
+
+.lawverra-editor .toastui-editor-defaultUI-toolbar button:hover,
+.lawverra-editor .toastui-editor-defaultUI-toolbar button:hover span {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Mode switch (edit/preview tabs) */
 .lawverra-editor .toastui-editor-mode-switch {
-  background-color: var(--lawverra-light-gold);
-  border-top: 1px solid var(--lawverra-gold);
+  background-color: hsl(var(--muted));
+  border-top: 1px solid hsl(var(--border));
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 .lawverra-editor .toastui-editor-mode-switch .tab-item {
-  color: var(--lawverra-navy);
+  color: hsl(var(--muted-foreground));
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.lawverra-editor .toastui-editor-mode-switch .tab-item:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }
 
 .lawverra-editor .toastui-editor-mode-switch .tab-item.active {
-  background-color: var(--lawverra-gold);
-  color: var(--lawverra-navy);
-  border-color: var(--lawverra-gold);
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+  font-weight: 500;
 }
 
+/* Code blocks */
 .lawverra-editor .toastui-editor-md-code-block-line-background {
-  background-color: var(--lawverra-light-gold);
+  background-color: hsl(var(--muted));
 }
 
-.lawverra-editor .toastui-editor-md-code {
-  background-color: var(--lawverra-light-gold);
-  color: var(--lawverra-navy);
+.lawverra-editor .toastui-editor-md-code,
+.lawverra-editor .toastui-editor-contents code {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
+.lawverra-editor .toastui-editor-contents pre {
+  background-color: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* Blockquotes */
 .lawverra-editor .toastui-editor-contents blockquote {
-  border-left: 4px solid var(--lawverra-gold);
-  background-color: var(--lawverra-light-gold);
+  border-left: 4px solid hsl(var(--primary));
+  background-color: hsl(var(--muted) / 0.5);
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0.25rem;
+  color: hsl(var(--foreground));
 }
 
+/* Headings */
 .lawverra-editor .toastui-editor-contents h1,
 .lawverra-editor .toastui-editor-contents h2,
 .lawverra-editor .toastui-editor-contents h3,
 .lawverra-editor .toastui-editor-contents h4,
 .lawverra-editor .toastui-editor-contents h5,
 .lawverra-editor .toastui-editor-contents h6 {
-  color: var(--lawverra-navy);
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
+/* Links */
 .lawverra-editor .toastui-editor-contents a {
-  color: var(--lawverra-gold);
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
 }
 
+.lawverra-editor .toastui-editor-contents a:hover {
+  color: hsl(var(--primary) / 0.8);
+}
+
+/* Horizontal rules */
 .lawverra-editor .toastui-editor-contents hr {
-  border-color: var(--lawverra-gold);
+  border-color: hsl(var(--border));
+  border-width: 1px 0 0 0;
+  margin: 2rem 0;
 }
 
-.lawverra-editor .toastui-editor-md-preview {
-  background-color: white;
+/* Tables */
+.lawverra-editor .toastui-editor-contents table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
-/* Dark mode adjustments */
-.dark .lawverra-editor .toastui-editor-defaultUI-toolbar {
-  background-color: var(--lawverra-navy);
-  border-bottom: 1px solid var(--lawverra-gold);
+.lawverra-editor .toastui-editor-contents th,
+.lawverra-editor .toastui-editor-contents td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.75rem;
+  text-align: left;
 }
 
-.dark .lawverra-editor .toastui-editor-main {
-  background-color: var(--lawverra-navy);
+.lawverra-editor .toastui-editor-contents th {
+  background-color: hsl(var(--muted));
+  font-weight: 600;
+  color: hsl(var(--foreground));
 }
 
-.dark .lawverra-editor .toastui-editor-md-container {
-  background-color: var(--lawverra-navy);
+/* Lists */
+.lawverra-editor .toastui-editor-contents ul,
+.lawverra-editor .toastui-editor-contents ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
 }
 
-.dark .lawverra-editor .toastui-editor-contents {
-  color: var(--lawverra-cream);
+.lawverra-editor .toastui-editor-contents li {
+  margin: 0.25rem 0;
+  color: hsl(var(--foreground));
 }
 
-.dark .lawverra-editor .toastui-editor-toolbar-icons {
-  border: 1px solid var(--lawverra-gold);
-  background-color: var(--lawverra-navy);
-  color: var(--lawverra-cream);
+/* Scrollbar styling */
+.lawverra-editor .toastui-editor-main::-webkit-scrollbar,
+.lawverra-editor .toastui-editor-md-container::-webkit-scrollbar {
+  width: 8px;
 }
 
-.dark .lawverra-editor .toastui-editor-toolbar-icons:hover {
-  background-color: #152a4a;
+.lawverra-editor .toastui-editor-main::-webkit-scrollbar-track,
+.lawverra-editor .toastui-editor-md-container::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
 }
 
-.dark .lawverra-editor .toastui-editor-mode-switch {
-  background-color: var(--lawverra-navy);
-  border-top: 1px solid var(--lawverra-gold);
+.lawverra-editor .toastui-editor-main::-webkit-scrollbar-thumb,
+.lawverra-editor .toastui-editor-md-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
 }
 
-.dark .lawverra-editor .toastui-editor-mode-switch .tab-item {
-  color: var(--lawverra-cream);
-}
-
-.dark .lawverra-editor .toastui-editor-mode-switch .tab-item.active {
-  background-color: var(--lawverra-gold);
-  color: var(--lawverra-navy);
-}
-
-.dark .lawverra-editor .toastui-editor-md-code-block-line-background {
-  background-color: #152a4a;
-}
-
-.dark .lawverra-editor .toastui-editor-md-code {
-  background-color: #152a4a;
-  color: var(--lawverra-cream);
-}
-
-.dark .lawverra-editor .toastui-editor-contents blockquote {
-  background-color: #152a4a;
-}
-
-.dark .lawverra-editor .toastui-editor-contents h1,
-.dark .lawverra-editor .toastui-editor-contents h2,
-.dark .lawverra-editor .toastui-editor-contents h3,
-.dark .lawverra-editor .toastui-editor-contents h4,
-.dark .lawverra-editor .toastui-editor-contents h5,
-.dark .lawverra-editor .toastui-editor-contents h6 {
-  color: var(--lawverra-cream);
+.lawverra-editor .toastui-editor-main::-webkit-scrollbar-thumb:hover,
+.lawverra-editor .toastui-editor-md-container::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
 }

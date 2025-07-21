@@ -11,7 +11,7 @@ async def get_profile(user_id: str) -> dict | None:
     """Fetches the user profile from the 'profiles' table."""
     try:
         response = supabase.table("profiles").select("*").eq("id", user_id).maybe_single().execute()
-        logging.debug(f"Supabase get_profile response for {user_id}: {response}")
+        # Removed debug logging
         if response.data:
             # Convert timestamp strings from Supabase to Unix timestamps if needed elsewhere
             # For now, returning the raw data which might include ISO strings
@@ -28,7 +28,7 @@ async def update_profile(user_id: str, data: dict) -> dict:
     data['updated_at'] = 'now()' # Use Supabase function
     try:
         response = supabase.table("profiles").update(data).eq("id", user_id).execute()
-        logging.debug(f"Supabase update_profile response for {user_id}: {response}")
+        # Removed debug logging
         if not response.data:
              # Attempt to fetch again in case update succeeded but returned no data
              updated_profile = await get_profile(user_id)
@@ -44,7 +44,7 @@ async def update_profile(user_id: str, data: dict) -> dict:
         raise HTTPException(status_code=500, detail="Database error during profile update.")
 
 
-async def create_profile_if_not_exists(user_id: str, email: str) -> dict:
+async def create_profile_if_not_exists(user_id: str, email: str, role: str = "self") -> dict:
     """Creates a profile row if it doesn't exist, returns existing or new profile."""
     profile = await get_profile(user_id)
     if profile:
@@ -54,9 +54,10 @@ async def create_profile_if_not_exists(user_id: str, email: str) -> dict:
         response = supabase.table("profiles").insert({
             "id": user_id,
             "email": email,
+            "role": role,
             # Add other default fields if necessary
         }).execute()
-        logging.debug(f"Supabase create_profile response for {user_id}: {response}")
+        # Removed debug logging
         if response.data:
             return response.data[0]
         else:
@@ -137,3 +138,17 @@ async def grant_payg_allowance(user_id: str, item_price_id: str, quantity: int):
              await update_profile(user_id, {"additional_doc_allowance": current_allowance + quantity})
              logging.info(f"Granted {quantity} additional doc allowance to user {user_id}")
      # Add elif for PRICE_AI_REPORT if it grants a credit instead of immediate use
+
+async def get_client_profile(attorney_id: str, client_profile_id: str) -> dict | None:
+    """
+    Fetches a client profile for a specific attorney from the 'client_profiles' table.
+    """
+    try:
+        response = supabase.table("client_profiles").select("*").eq("id", client_profile_id).eq("attorney_id", attorney_id).maybe_single().execute()
+        # Removed debug logging
+        if response.data:
+            return response.data
+        return None
+    except Exception as e:
+        logging.error(f"Error fetching client profile {client_profile_id} for attorney {attorney_id}: {e}")
+        return None

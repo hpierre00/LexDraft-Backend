@@ -5,14 +5,14 @@ from typing import List, Optional
 class Settings(BaseSettings):
     PROJECT_NAME: str = "LegalDoc SaaS"
     PROJECT_VERSION: str = "1.0.0"
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://lexdraft.netlify.app"]  # Explicitly allow local and Netlify frontends
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://lawverra.netlify.app", "https://lawverra.com"]  # Explicitly allow local and Netlify frontends
 
     # Server configuration
     HOST: str = "127.0.0.1"
     PORT: int = 8000
     DEBUG_MODE: bool = True
     WORKERS: int = 1
-    LOG_LEVEL: str = "INFO"
+    LOG_LEVEL: str = "WARNING"
 
     # Supabase configuration
     SUPABASE_URL: str
@@ -21,6 +21,13 @@ class Settings(BaseSettings):
 
     # OpenAI API Key
     OPENAI_API_KEY: str
+
+    # --- Email Configuration ---
+    SMTP_SERVER: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    FROM_EMAIL: str = "noreply@lawverra.com"
 
     # --- Stripe Configuration ---
     STRIPE_SECRET_KEY: str

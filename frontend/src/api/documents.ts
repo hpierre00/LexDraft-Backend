@@ -1,6 +1,8 @@
 import apiClient from './client';
+import { DocumentEvaluationResponse, ComplianceCheckResult, DocumentType, AreaOfLaw } from '@/lib/types';
 
 export interface Document {
+  client_profile_id: string;
   id: string;
   user_id: string;
   title: string;
@@ -8,12 +10,18 @@ export interface Document {
   status: string;
   created_at: string;
   updated_at: string;
-  evaluation_response?: string;
+  evaluation_response?: DocumentEvaluationResponse;
+  compliance_check_results?: ComplianceCheckResult; // Add this line
 }
 
 export interface CreateDocumentData {
   title: string;
   content: string;
+  county?: string;
+  date_of_application?: string;
+  case_number?: string;
+  document_type?: DocumentType;
+  area_of_law?: AreaOfLaw;
 }
 
 export interface UpdateDocumentData {
@@ -23,6 +31,24 @@ export interface UpdateDocumentData {
 }
 
 export const documentService = {
+  // Enhance an existing document with AI
+  async enhance(documentId: string, instructions: string) {
+    const response = await apiClient.post<Document>(`/documents/enhance/${documentId}`, { instructions });
+    return response.data;
+  },
+
+  // Upload and enhance a new document with AI
+  async enhanceUpload(file: File, instructions?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (instructions) formData.append('instructions', instructions);
+    const response = await apiClient.post<Document>(
+      '/documents/enhance/upload',
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    return response.data;
+  },
   async getAll() {
     // Backend route is /api/v1/documents/list
     const response = await apiClient.get<Document[]>('/documents/list');
@@ -99,6 +125,11 @@ export const documentService = {
     link.click();
     link.remove();
     window.URL.revokeObjectURL(url);
+  },
+
+  async runComplianceCheck(documentId: string) {
+    const response = await apiClient.post<Document>(`/documents/${documentId}/run-compliance`);
+    return response.data;
   },
 
   async upload(file: File) {

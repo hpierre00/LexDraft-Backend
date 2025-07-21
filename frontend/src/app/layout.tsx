@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const faviconSVG = `
-    <svg xmlns="http://www.w3.org/2000/svg" fill="#c9a55c" viewBox="0 0 24 24" stroke="#0a1e3a">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="%23c9a55c" viewBox="0 0 24 24" stroke="%230a1e3a">
       <path fillRule="evenodd" clipRule="evenodd" d="M3 6a3 3 0 013-3h4.586a2 2 0 011.414.586l1.414 1.414a2 2 0 001.414.586H18a3 3 0 013 3v9a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm15 2H6a1 1 0 00-1 1v7a1 1 0 001 1h12a1 1 0 001-1V9a1 1 0 00-1-1z" />
     </svg>
   `;
@@ -39,7 +39,12 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="light">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
             <Toaster />
           </ThemeProvider>

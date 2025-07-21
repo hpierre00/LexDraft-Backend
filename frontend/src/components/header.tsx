@@ -14,7 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User2, LogOut, Settings, User } from "lucide-react";
+import { User2, LogOut, Settings, User, LifeBuoy } from "lucide-react";
+import { ThemeToggleSimple } from "@/components/ui/theme-toggle";
 
 export const HeroHeader = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -70,6 +71,14 @@ export const HeroHeader = () => {
                   <Button>Go to Dashboard</Button>
                 </Link>
 
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/support">
+                    <LifeBuoy className="h-4 w-4" />
+                  </Link>
+                </Button>
+
+                <ThemeToggleSimple />
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-2">
@@ -109,6 +118,7 @@ export const HeroHeader = () => {
             </AnimatedGroup>
           ) : (
             <>
+              <ThemeToggleSimple />
               <AnimatedGroup delay={100}>
                 <Link href="/login">
                   <Button variant="ghost">Login</Button>

@@ -10,7 +10,7 @@ if not openai_api_key:
     raise ValueError("Missing OPENAI_API_KEY in .env file")
 
 # Initialize GPT-4.5 using LangChain
-llm = ChatOpenAI(model_name="gpt-4.5-turbo", temperature=0.7)
+llm = ChatOpenAI(model_name="gpt-4.1", temperature=0.7)
 
 def generate_response(prompt: str):
     try:

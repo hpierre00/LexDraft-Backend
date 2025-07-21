@@ -83,4 +83,21 @@ export const templateService = {
     }
     return { blob: response.data, filename };
   },
+
+  async uploadMultiple(formData: FormData) {
+    const response = await apiClient.post('/templates/upload-multi', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  async getByState(stateId: string) {
+    const response = await apiClient.get<{ templates: Template[] }>(`/templates/state/${stateId}`);
+    return response.data.templates;
+  },
+
+  async getByDocumentType(documentTypeId: string) {
+    const response = await apiClient.get<{ templates: Template[] }>(`/templates/type/${documentTypeId}`);
+    return response.data.templates;
+  },
 };

@@ -1,53 +1,81 @@
-import { Metadata } from "next";
-import { Card, CardContent } from "@/components/ui/card";
-
-export const metadata: Metadata = {
-  title: "About Lawverra",
-  description: "Learn about Lawverra's mission and technology",
-};
+import { Building, Target, Users, TrendingUp, Award, Zap } from "lucide-react";
+import { HeroHeader } from "@/components/header";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-6 py-16">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-foreground">
-            About Lawverra
-          </h1>
+    <>
+      <HeroHeader />
+      <div className="bg-background text-foreground pt-20">
+        <div className="container mx-auto py-16 px-6">
+          {/* Header */}
+          <div className="text-center space-y-4 mb-12">
+            <h1 className="text-5xl font-extrabold text-primary tracking-tight">
+              About Lawverra
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Revolutionizing the legal industry with AI-powered solutions that
+              enhance efficiency, accuracy, and access to justice.
+            </p>
+          </div>
 
-          <Card className="bg-card">
-            <CardContent className="pt-6">
-              <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-muted-foreground">
-                <p>
-                  Lawverra is a modern legal technology platform powered by
-                  artificial intelligence, designed to help legal professionals
-                  streamline their entire contract lifecycle. From intelligent
-                  drafting and clause-level analysis to real-time negotiation
-                  and compliance review, Lawverra equips legal teams with the
-                  tools they need to work faster, reduce risk, and operate more
-                  efficiently.
-                </p>
+          {/* Our Mission */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Our Mission</h2>
+            <p className="text-lg text-muted-foreground max-w-4xl mx-auto">
+              To empower legal professionals and individuals with intelligent
+              tools that streamline complex legal processes, saving time and
+              resources while ensuring the highest standards of quality.
+            </p>
+          </div>
 
-                <p>
-                  Built for solo attorneys, boutique law firms, and in-house
-                  legal departments at growing businesses, Lawverra delivers
-                  reliable, role-specific automation without replacing
-                  professional judgment. Our platform leverages advanced large
-                  language models (LLMs), proprietary clause intelligence
-                  engines, and secure workflows to support legal
-                  decision-making—not substitute it.
-                </p>
-
-                <p>
-                  We are committed to providing legally sound, ethically built
-                  tools that enhance the work of human professionals. Lawverra
-                  is not a law firm and does not offer legal advice.
+          {/* Core Values */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-center mb-8">
+              Our Core Values
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center p-6 border border-primary/20 rounded-lg bg-secondary/30">
+                <Award className="h-10 w-10 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Excellence</h3>
+                <p className="text-muted-foreground">
+                  We are committed to delivering the highest quality in our
+                  products and services.
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="text-center p-6 border border-primary/20 rounded-lg bg-secondary/30">
+                <Zap className="h-10 w-10 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Innovation</h3>
+                <p className="text-muted-foreground">
+                  We continuously push the boundaries of legal technology with
+                  cutting-edge AI.
+                </p>
+              </div>
+              <div className="text-center p-6 border border-primary/20 rounded-lg bg-secondary/30">
+                <Users className="h-10 w-10 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Customer-Centric</h3>
+                <p className="text-muted-foreground">
+                  Our users are at the heart of everything we do. We build for
+                  their success.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Our Story */}
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-4">Our Story</h2>
+            <p className="text-lg text-muted-foreground max-w-4xl mx-auto">
+              Founded by a team of legal experts and AI engineers, Lawverra was
+              born from a shared passion to modernize the legal field. We saw
+              the potential for technology to not only automate tedious tasks
+              but also to provide deeper insights and support for legal
+              professionals. Today, we are proud to serve thousands of users
+              worldwide, helping them achieve better outcomes with greater
+              efficiency.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
