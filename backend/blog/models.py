@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 import enum
 from datetime import datetime
 
-from ..database import Base  # adjust import as necessary based on your project structure
+from database import Base  # import Base from top-level database module
 
 class PostStatus(str, enum.Enum):
     draft = "draft"
