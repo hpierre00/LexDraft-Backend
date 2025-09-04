@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from . import models, schemas
-from ..database import get_db
+from.database import get_db
 # Placeholder for authentication and image upload dependencies
 # from .auth import get_current_user
 from .storage import upload_blog_image
