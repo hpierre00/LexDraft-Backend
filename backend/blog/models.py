@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Enum, func
+
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship
 import enum
@@ -32,7 +33,7 @@ class BlogPost(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255), nullable=False)
-    slug
+    slug = Column(String(255), nullable=False, unique=True, index=True)
     snippet = Column(String(500), nullable=True)
     content = Column(Text, nullable=False)
 
