@@ -36,10 +36,10 @@ class BlogPost(Base):
     snippet = Column(String(500), nullable=True)
     content = Column(Text, nullable=False)
 
-    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
     category_id = Column(Integer, ForeignKey("blog_categories.id"), nullable=True)
 
-    featured_image_url = Column(String(500), nullable=True)
+   author_id    = Column(Integer, nullable=False)
     featured_image_alt = Column(String(255), nullable=True)
     status = Column(Enum(PostStatus), default=PostStatus.draft, nullable=False)
     meta_title = Column(String(255), nullable=True)
